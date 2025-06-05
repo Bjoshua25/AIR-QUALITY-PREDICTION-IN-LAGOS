@@ -41,7 +41,7 @@ def wrangle(filepath):
     df.rename(columns={'value': 'PM2.5'}, inplace=True)
 
     # Resample to hourly frequency, forward fill
-    df = df['PM2.5'].resample('2h').mean().ffill().to_frame()
+    df = df['PM2.5'].resample('1h').mean().ffill().to_frame()
 
     # Rename index to 'date'
     df.index.name = 'date'
