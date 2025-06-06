@@ -72,20 +72,28 @@ def merge_monthly_files(folder_path = folder_path, output_csv_path = output_csv_
     return combined_df
 
 
-def load_combined_series(filepath=None):
+def load_combined_series(split=True, train_ratio=0.8):
     """
-    Loads the combined CSV into a Series with datetime index.
+    Load the combined Air Quality CSV, convert to a time series,
+    and optionally split into train and test series.
+
+    Parameters:
+        split (bool): Whether to split the data into train and test sets.
+        train_ratio (float): Proportion of data to use for training.
 
     Returns:
-        pd.Series: The PM2.5 values with datetime index.
+        tuple or pd.Series:
+            If split=True: (train_series, test_series)
+            If split=False: full time series as pd.Series
     """
-    filepath = cfg["data"]["combined_output_csv"]
+    combined_path = cfg["data"]["combined_output_csv"]
+    df = pd.read_csv(combined_path, index_col="date", parse_dates=True)
+    series = df["PM2.5"].resample("6h").mean().interpolate(method="time")
 
-    df = pd.read_csv(filepath, index_col="date", parse_dates=True)
-    df = df["PM2.5"].resample('6h').mean().interpolate(method = "time").to_frame()
-    df.sort_index(inplace=True)
-
-    if "PM2.5" not in df.columns:
-        raise ValueError("Expected 'PM2.5' column not found.")
-
-    return df["PM2.5"]
+    if split:
+        cutoff = int(len(series) * train_ratio)
+        y_train = series.iloc[:cutoff] 
+        y_test = series.iloc[cutoff:]
+        return y_train, y_test
+    else:
+        return series
