@@ -5,9 +5,9 @@ data:
 
 model:
   type: "SARIMA"
-  order: [2, 1, 3]
-  seasonal_order: [1, 0, 1, 28]
-  seasonal_period: 28
+  order: [3, 1, 1]
+  seasonal_order: [2, 0, 2, 4]
+  seasonal_period: 4
 
 paths:
   results_folder: "results/"

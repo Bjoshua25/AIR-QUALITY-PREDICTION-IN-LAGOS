@@ -1,4 +1,3 @@
-
 import os
 import joblib
 import glob
@@ -14,26 +13,14 @@ cfg = load_config()
 RESULTS_DIR = cfg["paths"]["results_folder"]
 os.makedirs(RESULTS_DIR, exist_ok=True)
 
-# load train and test split
+# Load train and test data
 y_train, y_test = load_combined_series()
-
-# Forecast using model
-start_date = y_test.index.min()
-end_date = y_test.index.max()
 
 
 def walk_forward_validate(train=y_train, test=y_test, order=cfg["model"]["order"], seasonal_order=cfg["model"]["seasonal_order"]):
     """
     Perform walk-forward validation using SARIMA.
-
-    Parameters:
-        train (pd.Series): Training time series.
-        test (pd.Series): Test time series.
-        order (tuple): ARIMA order (p,d,q).
-        seasonal_order (tuple): Seasonal order (P,D,Q,s).
-
-    Returns:
-        pd.DataFrame: DataFrame with 'y_test' and 'y_pred' columns.
+    Returns a DataFrame with actual and predicted test values.
     """
     preds = []
     history = train.copy()
@@ -47,7 +34,6 @@ def walk_forward_validate(train=y_train, test=y_test, order=cfg["model"]["order"
 
     preds_series = pd.Series(preds, index=test.index)
     df_pred = pd.DataFrame({
-        'y_train': train,
         'y_test': test,
         'y_pred': preds_series
     })
@@ -57,12 +43,6 @@ def walk_forward_validate(train=y_train, test=y_test, order=cfg["model"]["order"
 def save_walk_forward_results(df_pred):
     """
     Save walk-forward validation results to CSV.
-    params:
-        df_pred: pd.DataFrame
-            df_pred is the dataframe obtained from saved walk forward validation
-
-    Returns:
-        str: Filename of saved CSV.
     """
     timestamp = datetime.now().isoformat(timespec='seconds').replace(":", "-")
     filename = f"{timestamp}_walk_forward_results.csv"
@@ -73,10 +53,7 @@ def save_walk_forward_results(df_pred):
 
 def load_latest_wfv_results():
     """
-    Load the latest walk-forward validation results CSV.
-
-    Returns:
-        pd.DataFrame: WFV results with datetime index.
+    Load the most recent walk-forward validation CSV file.
     """
     pattern = os.path.join(RESULTS_DIR, "*_walk_forward_results.csv")
     wfv_files = sorted(glob.glob(pattern))
@@ -86,20 +63,13 @@ def load_latest_wfv_results():
 
     latest_file = wfv_files[-1]
     df = pd.read_csv(latest_file, index_col="date", parse_dates=True)
-    df["y_train"] = y_train
     print(f"Loaded WFV results: {os.path.basename(latest_file)}")
     return df
 
+
 def evaluate_forecast(y_true, y_pred):
     """
-    Compute evaluation metrics for forecast.
-
-    Parameters:
-        y_true (pd.Series): Actual values
-        y_pred (pd.Series): Predicted values
-
-    Returns:
-        tuple: Tuple containing MSE and MAE
+    Compute MSE and MAE.
     """
     mse = mean_squared_error(y_true, y_pred)
     mae = mean_absolute_error(y_true, y_pred)
@@ -112,7 +82,6 @@ def main():
     mse, mae = evaluate_forecast(df_pred['y_test'], df_pred['y_pred'])
     print(f"Walk-forward Validation - MSE: {mse:.2f}, MAE: {mae:.2f}")
 
+
 if __name__ == "__main__":
     main()
-
-
