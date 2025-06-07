@@ -3,7 +3,8 @@
 import pandas as pd
 from sklearn.metrics import mean_squared_error, mean_absolute_error
 import plotly.express as px
-from config import load_config
+from scripts.validate import load_latest_wfv_results
+from scripts.config import load_config
 
 cfg = load_config()
 
@@ -42,3 +43,15 @@ def plot_forecast(y_true, y_pred, title="Forecast vs Actual"):
         labels={"value": "PM2.5", "index": "Date"},
     )
     return fig
+
+
+
+def main():
+    df = load_latest_wfv_results()
+    mse, mae = evaluate_forecast(df["y_test"], df["y_pred"])
+    print(f"Evaluation Metrics - MSE: {mse:.2f}, MAE: {mae:.2f}")
+    fig = plot_forecast(df["y_test"], df["y_pred"])
+    fig.show()
+
+if __name__ == "__main__":
+    main()

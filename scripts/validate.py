@@ -7,8 +7,8 @@ import numpy as np
 from datetime import datetime
 from statsmodels.tsa.statespace.sarimax import SARIMAX
 from sklearn.metrics import mean_squared_error, mean_absolute_error
-from config import load_config
-from wrangle import load_combined_series
+from scripts.config import load_config
+from scripts.wrangle import load_combined_series
 
 cfg = load_config()
 RESULTS_DIR = cfg["paths"]["results_folder"]
@@ -47,6 +47,7 @@ def walk_forward_validate(train=y_train, test=y_test, order=cfg["model"]["order"
 
     preds_series = pd.Series(preds, index=test.index)
     df_pred = pd.DataFrame({
+        'y_train': train,
         'y_test': test,
         'y_pred': preds_series
     })
@@ -85,6 +86,7 @@ def load_latest_wfv_results():
 
     latest_file = wfv_files[-1]
     df = pd.read_csv(latest_file, index_col="date", parse_dates=True)
+    df["y_train"] = y_train
     print(f"Loaded WFV results: {os.path.basename(latest_file)}")
     return df
 
@@ -103,23 +105,14 @@ def evaluate_forecast(y_true, y_pred):
     mae = mean_absolute_error(y_true, y_pred)
     return mse, mae
 
-def main(train, test):
-    """
-    Run walk-forward validation pipeline.
 
-    parameters:
-        train (pd.Series): train split set
-        test (pd.Series): test split set
-
-    returns:
-        df_pred (pd.DataFrame): containing training set and walk forward predictions
-        mse
-        mae
-    """
-
-    df_pred = load_latest_wfv_results()
+def main():
+    df_pred = walk_forward_validate()
+    save_walk_forward_results(df_pred)
     mse, mae = evaluate_forecast(df_pred['y_test'], df_pred['y_pred'])
     print(f"Walk-forward Validation - MSE: {mse:.2f}, MAE: {mae:.2f}")
 
-    save_walk_forward_results(df_pred)
-    return df_pred, mse, mae
+if __name__ == "__main__":
+    main()
+
+

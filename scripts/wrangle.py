@@ -1,7 +1,7 @@
 import os
 import pandas as pd
 import glob
-from config import load_config
+from scripts.config import load_config
 
 cfg = load_config()
 folder_path = cfg["data"]["monthly_data_folder"]
@@ -54,6 +54,7 @@ def merge_monthly_files(folder_path = folder_path, output_csv_path = output_csv_
     Returns:
         pd.DataFrame: Combined DataFrame.
     """
+    print(f"Reading files from: {folder_path}")
     csv_files = sorted(glob.glob(os.path.join(folder_path, "*.csv")))
 
     dataframes = []
@@ -97,3 +98,11 @@ def load_combined_series(split=True, train_ratio=0.8):
         return y_train, y_test
     else:
         return series
+
+
+def main():
+    merge_monthly_files()
+
+if __name__ == "__main__":
+    main()
+

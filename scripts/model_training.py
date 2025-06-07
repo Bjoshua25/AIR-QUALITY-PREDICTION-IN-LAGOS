@@ -3,8 +3,8 @@ import joblib
 import glob
 from datetime import datetime
 from statsmodels.tsa.statespace.sarimax import SARIMAX
-from config import load_config
-from wrangle import load_combined_series
+from scripts.config import load_config
+from scripts.wrangle import load_combined_series
 
 # load train and test split
 y_train, y_test = load_combined_series()
@@ -121,3 +121,11 @@ def forecast_with_model(model, y_test=y_test):
     """
     return model.predict(start=y_test.index.min(), end=y_test.index.max())
 
+
+def main():
+    model = train_sarima_model()
+    save_model(model)
+    save_model_summary(model)
+
+if __name__ == "__main__":
+    main()
