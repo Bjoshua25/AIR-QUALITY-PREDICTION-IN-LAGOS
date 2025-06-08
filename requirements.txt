@@ -10,9 +10,10 @@ plotly>=5.0.0
 
 # Statsmodels for SARIMA
 statsmodels>=0.13.0
-
-# Other utilities
 scipy>=1.7.0
 
-# Optional but useful
+# YAML config support
+pyyaml>=6.0
+
+# Optional
 pillow>=9.0.0
