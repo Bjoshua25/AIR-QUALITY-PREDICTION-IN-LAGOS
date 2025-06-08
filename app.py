@@ -101,7 +101,7 @@ with tab2:
         "1 Year": 1440,
         "All Data": len(y)
     }
-    selected_range = st.radio("Time Range", list(eda_ranges.keys()))
+    selected_range = st.radio("Time Range", list(eda_ranges.keys()), index=list(eda_ranges.keys()).index("All Data"))
     n_points = eda_ranges[selected_range]
     if n_points < len(y):
         y = y[-n_points:]
