@@ -154,6 +154,6 @@ with tab2:
 st.markdown("---")
 st.markdown(
     "Made with ❤️ using [Streamlit](https://streamlit.io)  \n"
-    "Project by [Joshua Bolaji](https://github.com/BJoshua25) | "
+    "Project by [Joshua Bolaji](https://github.com/Bjoshua25/AIR-QUALITY-PREDICTION-IN-LAGOS/tree/main) | "
     "Data: [OpenAfrica](https://open.africa/dataset/sensorsafrica-airquality-archive-lagos)"
 )
